@@ -9,6 +9,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.Socket;
 
+import org.apache.commons.io.FileUtils;
+
 public class FileTransferProtocolsImp implements FileTransferProtocols {
 	FileOutputStream fos = null;
 
@@ -26,23 +28,31 @@ public class FileTransferProtocolsImp implements FileTransferProtocols {
                   System.out.println("the string data=="+stringData );
 				br = new BufferedReader(new FileReader(child));
 				byte[] b = new byte[30000];
-				String k = br.readLine() ;          //readLine(b,0,b.length);
-				System.out.println("readline data=="+k);
-				k = ",FILEDATA," + k;
-				System.out.println("readline filedata=="+k);
-				stringData = stringData + k;
+				String line;
+				StringBuffer bufferReader=new StringBuffer();
+				
+				while ((line = br.readLine()) != null && line.length()!= 0) { 
+					bufferReader.append(line);
+					bufferReader.append("#");
+				}
+				//String k = br.readLine() ;          //readLine(b,0,b.length);
+				//System.out.println("readline data=="+k);
+				String finalData = ",FILEDATA," + bufferReader.toString();
+				System.out.println("readline filedata=="+bufferReader);
+				stringData = stringData + finalData;
 				System.out.println("readline filedata=="+stringData);
 				DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 				dos.writeUTF(stringData);
-
+				System.out.println("Delete File:"+child.delete());
+				
 			}
 
 			// Add if you want to delete the source folder
 
-			//folder.delete();
+			
 
 		}
-
+		FileUtils.forceDelete(folder);
 	}
 
 	@Override
@@ -67,9 +77,11 @@ public class FileTransferProtocolsImp implements FileTransferProtocols {
 		}
 
 		if (param[2].equals("FILEDATA")) {
+			System.out.println("------------------------------------------------");
+			System.out.println(param[3]);
 			String receivedData=param[3]+verified;
-			byte[] b = receivedData.getBytes();
-			fos.write(b);
+			//byte[] b = receivedData.getBytes();
+			fos.write(receivedData.getBytes());
 		}
 
 	}
