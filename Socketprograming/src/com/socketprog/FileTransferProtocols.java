@@ -8,7 +8,7 @@ public interface FileTransferProtocols {
 	
 	void readFolder(final File folder,Socket s)throws IOException;
 	void upload(String fileFolder,Socket s,String verification) throws IOException;
-	void delete();
+	void delete(File file);
 	void writeFolder();
 	
 

@@ -1,11 +1,13 @@
 package com.socketprog;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -19,9 +21,9 @@ public class FileTransferProtocolsImp implements FileTransferProtocols {
 
 		File[] listOfFiles = folder.listFiles();
 		BufferedReader br = null;
-		System.out.println("the list of files===="+listOfFiles.length);
+		DataOutputStream dos=null;
 		
-		if (listOfFiles != null) {
+			if (listOfFiles != null) {
 			for (File child : listOfFiles) {
 
 				String stringData = "FILENAME," + child.getName();
@@ -38,21 +40,25 @@ public class FileTransferProtocolsImp implements FileTransferProtocols {
 				//String k = br.readLine() ;          //readLine(b,0,b.length);
 				//System.out.println("readline data=="+k);
 				String finalData = ",FILEDATA," + bufferReader.toString();
-				System.out.println("readline filedata=="+bufferReader);
 				stringData = stringData + finalData;
 				System.out.println("readline filedata=="+stringData);
-				DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+				 dos = new DataOutputStream(s.getOutputStream());
 				dos.writeUTF(stringData);
-				System.out.println("Delete File:"+child.delete());
+				
 				
 			}
-
+         
+           
+           
+			
 			// Add if you want to delete the source folder
-
+             
 			
 
 		}
-		FileUtils.forceDelete(folder);
+		//FileUtils.forceDelete(folder);
+		
+      
 	}
 
 	@Override
@@ -71,7 +77,7 @@ public class FileTransferProtocolsImp implements FileTransferProtocols {
 
 		if (param[0].equals("FILENAME")) {
 			fos = new FileOutputStream(fileFolder + param[1]);
-			System.out.println("param[0]===" + fileFolder + param[1]);
+			
 			// byte[] b = param[1].getBytes();
 			// fos.write(b);
 		}
@@ -83,12 +89,22 @@ public class FileTransferProtocolsImp implements FileTransferProtocols {
 			//byte[] b = receivedData.getBytes();
 			fos.write(receivedData.getBytes());
 		}
+		
+		
+		
 
 	}
 
 	@Override
-	public void delete() {
-
+	public void delete(File file) {
+		
+        
+       
+		File[] listOfFiles = file.listFiles();
+		for(File f:listOfFiles){
+			f.deleteOnExit();
+		
+		}
 	}
 
 	@Override
